@@ -10,6 +10,7 @@ export const useGlobalData = () =>  {
     const router = useRouter()
     const isMobileView = ref(false)
     const showMobileFilters = ref(false)
+    const isViewportReady = ref(false)
     const pendingSearchQuery = ref('')
     const pendingDepartments = ref([])
     const pendingLocations = ref([])
@@ -21,12 +22,19 @@ export const useGlobalData = () =>  {
     }
 
     onMounted(() => {
-        updateMobileStatus()
-        window.addEventListener('resize', updateMobileStatus)
-    })
-
-    onUnmounted(() => {
-        window.removeEventListener('resize', updateMobileStatus)
+        const mediaQuery = window.matchMedia('(max-width: 768px)')
+        isMobileView.value = mediaQuery.matches
+        isViewportReady.value = true
+        
+        const handleResize = (e) => {
+            isMobileView.value = e.matches
+        }
+        
+        mediaQuery.addEventListener('change', handleResize)
+        
+        onUnmounted(() => {
+            mediaQuery.removeEventListener('change', handleResize)
+        })
     })
 
     console.warn('router', route.query);
@@ -329,6 +337,7 @@ export const useGlobalData = () =>  {
         toggleAllLocations,
         toggleAllLevels,
         isMobileView,
+        isViewportReady,
         showMobileFilters,
         applyMobileFilters,
         resetMobileFilters,
