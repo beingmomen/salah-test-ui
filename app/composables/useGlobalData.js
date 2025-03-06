@@ -213,6 +213,63 @@ export const useGlobalData = () =>  {
         }
     }
 
+    // Watch for changes in selections to update "Select All" states
+    watch([selectedDepartments, pendingDepartments], ([selected, pending]) => {
+        const departments = allData.value.departments?.map(dept => String(dept.documentNumber)) || []
+        if (isMobileView.value) {
+            selectAllDepartments.value = departments.length > 0 && 
+                departments.every(dept => pending.includes(dept))
+        } else {
+            selectAllDepartments.value = departments.length > 0 && 
+                departments.every(dept => selected.includes(dept))
+        }
+    }, { immediate: true })
+
+    watch([selectedLocations, pendingLocations], ([selected, pending]) => {
+        const locations = allData.value.locations?.map(loc => String(loc.documentNumber)) || []
+        if (isMobileView.value) {
+            selectAllLocations.value = locations.length > 0 && 
+                locations.every(loc => pending.includes(loc))
+        } else {
+            selectAllLocations.value = locations.length > 0 && 
+                locations.every(loc => selected.includes(loc))
+        }
+    }, { immediate: true })
+
+    watch([selectedLevels, pendingLevels], ([selected, pending]) => {
+        const levels = allData.value.levels?.map(level => String(level.documentNumber)) || []
+        if (isMobileView.value) {
+            selectAllLevels.value = levels.length > 0 && 
+                levels.every(level => pending.includes(level))
+        } else {
+            selectAllLevels.value = levels.length > 0 && 
+                levels.every(level => selected.includes(level))
+        }
+    }, { immediate: true })
+
+    // Watch for changes in allData to update "Select All" states when data loads
+    watch(() => allData.value, () => {
+        const departments = allData.value.departments?.map(dept => String(dept.documentNumber)) || []
+        const locations = allData.value.locations?.map(loc => String(loc.documentNumber)) || []
+        const levels = allData.value.levels?.map(level => String(level.documentNumber)) || []
+
+        if (isMobileView.value) {
+            selectAllDepartments.value = departments.length > 0 && 
+                departments.every(dept => pendingDepartments.value.includes(dept))
+            selectAllLocations.value = locations.length > 0 && 
+                locations.every(loc => pendingLocations.value.includes(loc))
+            selectAllLevels.value = levels.length > 0 && 
+                levels.every(level => pendingLevels.value.includes(level))
+        } else {
+            selectAllDepartments.value = departments.length > 0 && 
+                departments.every(dept => selectedDepartments.value.includes(dept))
+            selectAllLocations.value = locations.length > 0 && 
+                locations.every(loc => selectedLocations.value.includes(loc))
+            selectAllLevels.value = levels.length > 0 && 
+                levels.every(level => selectedLevels.value.includes(level))
+        }
+    }, { immediate: true })
+
     const { get } = useApiRequest();
 
     const fetchGlobalData = async () => {
