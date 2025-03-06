@@ -1,14 +1,33 @@
 import { useApiRequest } from "./useApiRequest";
 import { useRouter, useRoute } from 'vue-router'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 const allData = ref({})
 const jobs = ref([])
 
 export const useGlobalData = () =>  {
-
     const route = useRoute()
     const router = useRouter()
+    const isMobileView = ref(false)
+    const showMobileFilters = ref(false)
+    const pendingSearchQuery = ref('')
+    const pendingDepartments = ref([])
+    const pendingLocations = ref([])
+    const pendingLevels = ref([])
+
+    // Update mobile view status
+    const updateMobileStatus = () => {
+        isMobileView.value = window.innerWidth < 768
+    }
+
+    onMounted(() => {
+        updateMobileStatus()
+        window.addEventListener('resize', updateMobileStatus)
+    })
+
+    onUnmounted(() => {
+        window.removeEventListener('resize', updateMobileStatus)
+    })
 
     console.warn('router', route.query);
 
@@ -16,13 +35,36 @@ export const useGlobalData = () =>  {
     const debouncedSearch = ref(searchQuery.value)
 
     watch(searchQuery, (newValue) => {
-        debouncedSearch.value = newValue
+        if (isMobileView.value) {
+            pendingSearchQuery.value = newValue
+        } else {
+            debouncedSearch.value = newValue
+        }
     }, { immediate: true })
 
     // Debounced watcher to update filters
     watch(debouncedSearch, (newValue) => {
-        updateFilters()
+        if (!isMobileView.value) {
+            updateFilters()
+        }
     }, { debounce: 300 })
+
+    // Watch for screen size changes to reset pending values
+    watch(isMobileView, (newValue) => {
+        if (newValue) {
+            // When switching to mobile, initialize pending values
+            pendingSearchQuery.value = searchQuery.value
+            pendingDepartments.value = [...selectedDepartments.value]
+            pendingLocations.value = [...selectedLocations.value]
+            pendingLevels.value = [...selectedLevels.value]
+        } else {
+            // When switching to desktop, apply any pending changes
+            if (showMobileFilters.value) {
+                applyMobileFilters()
+            }
+            showMobileFilters.value = false
+        }
+    })
 
     const selectAllDepartments = ref(false)
     const selectAllLocations = ref(false)
@@ -43,57 +85,100 @@ export const useGlobalData = () =>  {
     const selectedLocations = ref(parseQueryParam(route.query.location))
     const selectedLevels = ref(parseQueryParam(route.query.level))
 
+    // Initialize pending selections
+    pendingDepartments.value = [...selectedDepartments.value]
+    pendingLocations.value = [...selectedLocations.value]
+    pendingLevels.value = [...selectedLevels.value]
 
     const updateFilters = () => {
         const query = {}
         
-        if (debouncedSearch.value) {
-            query.search = debouncedSearch.value
+        // Use the current active values based on view mode
+        const searchValue = isMobileView.value ? pendingSearchQuery.value : debouncedSearch.value
+        const depts = isMobileView.value ? pendingDepartments.value : selectedDepartments.value
+        const locs = isMobileView.value ? pendingLocations.value : selectedLocations.value
+        const lvls = isMobileView.value ? pendingLevels.value : selectedLevels.value
+        
+        if (searchValue) {
+            query.search = searchValue
         }
         
-        if (selectedDepartments.value.length) {
-            query.department = selectedDepartments.value.join(',')
+        if (depts.length) {
+            query.department = depts.join(',')
         }
         
-        if (selectedLocations.value.length) {
-            query.location = selectedLocations.value.join(',')
+        if (locs.length) {
+            query.location = locs.join(',')
         }
         
-        if (selectedLevels.value.length) {
-            query.level = selectedLevels.value.join(',')
+        if (lvls.length) {
+            query.level = lvls.join(',')
         }
         
         router.push({ query })
 
+        if (isMobileView.value) {
+            // Update the actual selections with pending values
+            searchQuery.value = pendingSearchQuery.value
+            selectedDepartments.value = [...pendingDepartments.value]
+            selectedLocations.value = [...pendingLocations.value]
+            selectedLevels.value = [...selectedLevels.value]
+        }
+
+        // Fetch jobs after updating the URL and selections
         fetchAllJobs()
     }
 
-    const toggleAllDepartments = () => {
-        if (selectAllDepartments.value) {
-            selectedDepartments.value = allData.value.departments?.map(dept => String(dept.documentNumber)) || []
-        } else {
-            selectedDepartments.value = []
-        }
+    const applyMobileFilters = () => {
         updateFilters()
+    }
+
+    const resetMobileFilters = () => {
+        pendingSearchQuery.value = searchQuery.value
+        pendingDepartments.value = [...selectedDepartments.value]
+        pendingLocations.value = [...selectedLocations.value]
+        pendingLevels.value = [...selectedLevels.value]
+    }
+
+    const toggleAllDepartments = () => {
+        const newValues = selectAllDepartments.value 
+            ? allData.value.departments?.map(dept => String(dept.documentNumber)) || []
+            : [];
+
+        if (isMobileView.value) {
+            pendingDepartments.value = newValues
+        } else {
+            selectedDepartments.value = newValues
+            updateFilters()
+        }
     }
 
     const toggleAllLocations = () => {
-        if (selectAllLocations.value) {
-            selectedLocations.value = allData.value.locations?.map(loc => String(loc.documentNumber)) || []
+        const newValues = selectAllLocations.value 
+            ? allData.value.locations?.map(loc => String(loc.documentNumber)) || []
+            : [];
+
+        if (isMobileView.value) {
+            pendingLocations.value = newValues
         } else {
-            selectedLocations.value = []
+            selectedLocations.value = newValues
+            updateFilters()
         }
-        updateFilters()
     }
 
     const toggleAllLevels = () => {
-        if (selectAllLevels.value) {
-            selectedLevels.value = allData.value.levels?.map(level => String(level.documentNumber)) || []
+        const newValues = selectAllLevels.value 
+            ? allData.value.levels?.map(level => String(level.documentNumber)) || []
+            : [];
+
+        if (isMobileView.value) {
+            pendingLevels.value = newValues
         } else {
-            selectedLevels.value = []
+            selectedLevels.value = newValues
+            updateFilters()
         }
-        updateFilters()
     }
+
     const { get } = useApiRequest();
 
     const fetchGlobalData = async () => {
@@ -113,10 +198,16 @@ export const useGlobalData = () =>  {
     const fetchAllJobs = async () => {
         const params = {};
         
-        if (debouncedSearch.value) params.search = debouncedSearch.value;
-        if (selectedDepartments.value.length) params.department = selectedDepartments.value.join(',');
-        if (selectedLocations.value.length) params.location = selectedLocations.value.join(',');
-        if (selectedLevels.value.length) params.level = selectedLevels.value.join(',');
+        // Use the current active values based on view mode
+        const searchValue = isMobileView.value ? pendingSearchQuery.value : searchQuery.value;
+        const depts = isMobileView.value ? pendingDepartments.value : selectedDepartments.value;
+        const locs = isMobileView.value ? pendingLocations.value : selectedLocations.value;
+        const lvls = isMobileView.value ? pendingLevels.value : selectedLevels.value;
+        
+        if (searchValue) params.search = searchValue;
+        if (depts.length) params.department = depts.join(',');
+        if (locs.length) params.location = locs.join(',');
+        if (lvls.length) params.level = lvls.join(',');
         
         params.limit = 5;
         
@@ -132,15 +223,23 @@ export const useGlobalData = () =>  {
         jobs,
         fetchAllJobs,
         searchQuery,
+        pendingSearchQuery,
         selectAllDepartments,
         selectAllLocations,
         selectAllLevels,
         selectedDepartments,
         selectedLocations,
         selectedLevels,
+        pendingDepartments,
+        pendingLocations,
+        pendingLevels,
         updateFilters,
         toggleAllDepartments,
         toggleAllLocations,
-        toggleAllLevels
+        toggleAllLevels,
+        isMobileView,
+        showMobileFilters,
+        applyMobileFilters,
+        resetMobileFilters
     }
 }

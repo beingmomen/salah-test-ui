@@ -1,8 +1,155 @@
 <template>
   <div class="container mx-auto py-8 px-4">
     <div class="flex gap-8">
-      <!-- Sidebar -->
-      <div class="w-80 flex-shrink-0 space-y-6">
+      <!-- Mobile Filter Button -->
+      <UButton
+        v-if="isMobileView"
+        class="fixed bottom-4 right-4 z-50"
+        color="primary"
+        @click="showMobileFilters = true"
+      >
+        <div class="flex items-center gap-2">
+          <Icon name="i-lucide-filter" />
+          Filters
+        </div>
+      </UButton>
+
+      <!-- Mobile Filters Sidebar -->
+      <Teleport to="body">
+        <div v-if="isMobileView" 
+          class="fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity"
+          :class="{ 'opacity-0 pointer-events-none': !showMobileFilters, 'opacity-100': showMobileFilters }"
+          @click="showMobileFilters = false"
+        >
+          <div 
+            class="fixed inset-y-0 left-0 w-80 bg-white dark:bg-gray-900 transform transition-transform duration-300 overflow-y-auto"
+            :class="{ '-translate-x-full': !showMobileFilters, 'translate-x-0': showMobileFilters }"
+            @click.stop
+          >
+            <div class="p-4 space-y-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">Filters</h3>
+                <UButton icon="i-lucide-x" color="gray" variant="ghost" @click="showMobileFilters = false" />
+              </div>
+
+              <UInput
+                v-model="pendingSearchQuery"
+                placeholder="Search jobs..."
+                icon="i-lucide-search"
+              />
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="font-semibold">Departments</h4>
+                  <UCheckbox
+                    v-model="selectAllDepartments"
+                    label="All"
+                    @change="toggleAllDepartments"
+                  />
+                </div>
+                <ul class="space-y-2">
+                  <li v-for="dept in allData.departments" :key="dept.documentNumber">
+                    <UCheckbox
+                      :model-value="pendingDepartments.includes(String(dept.documentNumber))"
+                      :label="dept.name"
+                      @update:model-value="(checked) => {
+                        if (checked) {
+                          pendingDepartments.push(String(dept.documentNumber))
+                        } else {
+                          const index = pendingDepartments.indexOf(String(dept.documentNumber))
+                          if (index > -1) {
+                            pendingDepartments.splice(index, 1)
+                          }
+                        }
+                      }"
+                    />
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="font-semibold">Locations</h4>
+                  <UCheckbox
+                    v-model="selectAllLocations"
+                    label="All"
+                    @change="toggleAllLocations"
+                  />
+                </div>
+                <ul class="space-y-2">
+                  <li v-for="location in allData.locations" :key="location.documentNumber">
+                    <UCheckbox
+                      :model-value="pendingLocations.includes(String(location.documentNumber))"
+                      :label="location.name"
+                      @update:model-value="(checked) => {
+                        if (checked) {
+                          pendingLocations.push(String(location.documentNumber))
+                        } else {
+                          const index = pendingLocations.indexOf(String(location.documentNumber))
+                          if (index > -1) {
+                            pendingLocations.splice(index, 1)
+                          }
+                        }
+                      }"
+                    />
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="font-semibold">Levels</h4>
+                  <UCheckbox
+                    v-model="selectAllLevels"
+                    label="All"
+                    @change="toggleAllLevels"
+                  />
+                </div>
+                <ul class="space-y-2">
+                  <li v-for="level in allData.levels" :key="level.documentNumber">
+                    <UCheckbox
+                      :model-value="pendingLevels.includes(String(level.documentNumber))"
+                      :label="level.name"
+                      @update:model-value="(checked) => {
+                        if (checked) {
+                          pendingLevels.push(String(level.documentNumber))
+                        } else {
+                          const index = pendingLevels.indexOf(String(level.documentNumber))
+                          if (index > -1) {
+                            pendingLevels.splice(index, 1)
+                          }
+                        }
+                      }"
+                    />
+                  </li>
+                </ul>
+              </div>
+
+              <div class="flex justify-between gap-4 mt-8">
+                <UButton
+                  color="gray"
+                  variant="soft"
+                  @click="resetMobileFilters"
+                >
+                  Reset
+                </UButton>
+                <UButton
+                  color="primary"
+                  @click="() => {
+                    applyMobileFilters()
+                    showMobileFilters = false
+                  }"
+                >
+                  Apply Filters
+                </UButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+
+      <!-- Desktop Sidebar -->
+      <div v-if="!isMobileView" class="w-80 flex-shrink-0 space-y-6">
         <UCard>
           <UInput
             v-model="searchQuery"
@@ -186,6 +333,14 @@ const {
   toggleAllDepartments,
   toggleAllLocations,
   toggleAllLevels,
+  isMobileView,
+  pendingSearchQuery,
+  pendingDepartments,
+  pendingLocations,
+  pendingLevels,
+  showMobileFilters,
+  applyMobileFilters,
+  resetMobileFilters,
 } = useGlobalData();
 
 await fetchAllJobs();
