@@ -133,11 +133,45 @@ export const useGlobalData = () =>  {
         updateFilters()
     }
 
+    const resetFilters = () => {
+        // Reset all filter values
+        searchQuery.value = ''
+        debouncedSearch.value = ''
+        pendingSearchQuery.value = ''
+        
+        selectedDepartments.value = []
+        selectedLocations.value = []
+        selectedLevels.value = []
+        
+        pendingDepartments.value = []
+        pendingLocations.value = []
+        pendingLevels.value = []
+        
+        selectAllDepartments.value = false
+        selectAllLocations.value = false
+        selectAllLevels.value = false
+
+        // Clear URL query params
+        router.push({ query: {} })
+
+        // Fetch jobs with no filters
+        fetchAllJobs()
+    }
+
     const resetMobileFilters = () => {
-        pendingSearchQuery.value = searchQuery.value
-        pendingDepartments.value = [...selectedDepartments.value]
-        pendingLocations.value = [...selectedLocations.value]
-        pendingLevels.value = [...selectedLevels.value]
+        if (isMobileView.value) {
+            // In mobile, only reset pending values
+            pendingSearchQuery.value = ''
+            pendingDepartments.value = []
+            pendingLocations.value = []
+            pendingLevels.value = []
+            
+            selectAllDepartments.value = false
+            selectAllLocations.value = false
+            selectAllLevels.value = false
+        } else {
+            resetFilters()
+        }
     }
 
     const toggleAllDepartments = () => {
@@ -240,6 +274,7 @@ export const useGlobalData = () =>  {
         isMobileView,
         showMobileFilters,
         applyMobileFilters,
-        resetMobileFilters
+        resetMobileFilters,
+        resetFilters
     }
 }

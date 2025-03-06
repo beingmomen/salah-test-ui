@@ -161,97 +161,109 @@
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold">Departments</h3>
-              <UCheckbox
-                v-model="selectAllDepartments"
-                label="All"
-                @change="toggleAllDepartments"
-              />
+              <h3 class="text-lg font-semibold">Filters</h3>
+              <UButton
+                color="gray"
+                variant="soft"
+                size="sm"
+                @click="resetFilters"
+              >
+                Reset All
+              </UButton>
             </div>
           </template>
-          <ul class="space-y-2">
-            <li v-for="dept in allData.departments" :key="dept.documentNumber">
-              <UCheckbox
-                :model-value="selectedDepartments.includes(String(dept.documentNumber))"
-                :label="dept.name"
-                @update:model-value="(checked) => {
-                  if (checked) {
-                    selectedDepartments.push(String(dept.documentNumber))
-                  } else {
-                    const index = selectedDepartments.indexOf(String(dept.documentNumber))
-                    if (index > -1) {
-                      selectedDepartments.splice(index, 1)
-                    }
-                  }
-                  updateFilters()
-                }"
-              />
-            </li>
-          </ul>
-        </UCard>
 
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold">Locations</h3>
-              <UCheckbox
-                v-model="selectAllLocations"
-                label="All"
-                @change="toggleAllLocations"
-              />
+          <div class="space-y-6">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="font-semibold">Departments</h4>
+                <UCheckbox
+                  v-model="selectAllDepartments"
+                  label="All"
+                  @change="toggleAllDepartments"
+                />
+              </div>
+              <ul class="space-y-2">
+                <li v-for="dept in allData.departments" :key="dept.documentNumber">
+                  <UCheckbox
+                    :model-value="selectedDepartments.includes(String(dept.documentNumber))"
+                    :label="dept.name"
+                    @update:model-value="(checked) => {
+                      if (checked) {
+                        selectedDepartments.push(String(dept.documentNumber))
+                      } else {
+                        const index = selectedDepartments.indexOf(String(dept.documentNumber))
+                        if (index > -1) {
+                          selectedDepartments.splice(index, 1)
+                        }
+                      }
+                      updateFilters()
+                    }"
+                  />
+                </li>
+              </ul>
             </div>
-          </template>
-          <ul class="space-y-2">
-            <li v-for="location in allData.locations" :key="location.documentNumber">
-              <UCheckbox
-                :model-value="selectedLocations.includes(String(location.documentNumber))"
-                :label="location.name"
-                @update:model-value="(checked) => {
-                  if (checked) {
-                    selectedLocations.push(String(location.documentNumber))
-                  } else {
-                    const index = selectedLocations.indexOf(String(location.documentNumber))
-                    if (index > -1) {
-                      selectedLocations.splice(index, 1)
-                    }
-                  }
-                  updateFilters()
-                }"
-              />
-            </li>
-          </ul>
-        </UCard>
 
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold">Levels</h3>
-              <UCheckbox
-                v-model="selectAllLevels"
-                label="All"
-                @change="toggleAllLevels"
-              />
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="font-semibold">Locations</h4>
+                <UCheckbox
+                  v-model="selectAllLocations"
+                  label="All"
+                  @change="toggleAllLocations"
+                />
+              </div>
+              <ul class="space-y-2">
+                <li v-for="location in allData.locations" :key="location.documentNumber">
+                  <UCheckbox
+                    :model-value="selectedLocations.includes(String(location.documentNumber))"
+                    :label="location.name"
+                    @update:model-value="(checked) => {
+                      if (checked) {
+                        selectedLocations.push(String(location.documentNumber))
+                      } else {
+                        const index = selectedLocations.indexOf(String(location.documentNumber))
+                        if (index > -1) {
+                          selectedLocations.splice(index, 1)
+                        }
+                      }
+                      updateFilters()
+                    }"
+                  />
+                </li>
+              </ul>
             </div>
-          </template>
-          <ul class="space-y-2">
-            <li v-for="level in allData.levels" :key="level.documentNumber">
-              <UCheckbox
-                :model-value="selectedLevels.includes(String(level.documentNumber))"
-                :label="level.name"
-                @update:model-value="(checked) => {
-                  if (checked) {
-                    selectedLevels.push(String(level.documentNumber))
-                  } else {
-                    const index = selectedLevels.indexOf(String(level.documentNumber))
-                    if (index > -1) {
-                      selectedLevels.splice(index, 1)
-                    }
-                  }
-                  updateFilters()
-                }"
-              />
-            </li>
-          </ul>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="font-semibold">Levels</h4>
+                <UCheckbox
+                  v-model="selectAllLevels"
+                  label="All"
+                  @change="toggleAllLevels"
+                />
+              </div>
+              <ul class="space-y-2">
+                <li v-for="level in allData.levels" :key="level.documentNumber">
+                  <UCheckbox
+                    :model-value="selectedLevels.includes(String(level.documentNumber))"
+                    :label="level.name"
+                    @update:model-value="(checked) => {
+                      if (checked) {
+                        selectedLevels.push(String(level.documentNumber))
+                      } else {
+                        const index = selectedLevels.indexOf(String(level.documentNumber))
+                        if (index > -1) {
+                          selectedLevels.splice(index, 1)
+                        }
+                      }
+                      updateFilters()
+                    }"
+                  />
+                </li>
+              </ul>
+            </div>
+          </div>
         </UCard>
       </div>
 
@@ -341,6 +353,7 @@ const {
   showMobileFilters,
   applyMobileFilters,
   resetMobileFilters,
+  resetFilters,
 } = useGlobalData();
 
 await fetchAllJobs();
