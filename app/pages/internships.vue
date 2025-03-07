@@ -36,7 +36,7 @@
 
                 <UInput
                   v-model="pendingSearchQuery"
-                  placeholder="Search jobs..."
+                  placeholder="Search internships..."
                   icon="i-lucide-search"
                 />
 
@@ -158,7 +158,7 @@
           <UCard>
             <UInput
               v-model="searchQuery"
-              placeholder="Search jobs..."
+              placeholder="Search internships..."
               icon="i-lucide-search"
             />
           </UCard>
@@ -347,35 +347,37 @@
 import { useGlobalData } from "~/composables/useGlobalData";
 
 const {
-  fetchAllJobs,
   allData,
   jobs,
+  isMobileView,
+  isViewportReady,
   searchQuery,
+  pendingSearchQuery,
+  selectedDepartments,
+  pendingDepartments,
+  selectedLocations,
+  pendingLocations,
+  selectedLevels,
+  pendingLevels,
   selectAllDepartments,
   selectAllLocations,
   selectAllLevels,
-  selectedDepartments,
-  selectedLocations,
-  selectedLevels,
-  updateFilters,
+  showMobileFilters,
+  resetFilters,
+  resetMobileFilters,
   toggleAllDepartments,
   toggleAllLocations,
   toggleAllLevels,
-  isMobileView,
-  pendingSearchQuery,
-  pendingDepartments,
-  pendingLocations,
-  pendingLevels,
-  showMobileFilters,
+  updateFilters,
   applyMobileFilters,
-  resetMobileFilters,
-  resetFilters,
-  isViewportReady,
-} = useGlobalData({
-  isInternship: true
-});
+  fetchAllJobs,
+} = useGlobalData({ isInternship: true });
 
-await fetchAllJobs();
+// Initialize data
+import { onMounted } from 'vue';
+onMounted(async () => {
+  await fetchAllJobs();
+});
 </script>
 
 <style scoped>

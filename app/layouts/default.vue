@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center h-16">
           <!-- Logo and Brand -->
           <div class="flex items-center">
-            <NuxtLink to="/" class="flex items-center space-x-2">
+            <NuxtLink :to="{ path: '/' }" class="flex items-center space-x-2">
               <UIcon name="i-lucide-briefcase" class="text-primary text-2xl" />
               <span class="font-bold text-xl text-gray-900">JobPortal</span>
             </NuxtLink>
@@ -14,21 +14,15 @@
 
           <!-- Navigation Links -->
           <div class="hidden md:flex items-center space-x-8">
-            <NuxtLink to="/" class="text-gray-700 hover:text-primary transition-colors">
+            <NuxtLink :to="{ path: '/' }" class="text-gray-700 hover:text-primary transition-colors">
               Home
             </NuxtLink>
-            <NuxtLink to="/jobs" class="text-gray-700 hover:text-primary transition-colors">
+            <NuxtLink :to="{ path: '/jobs' }" class="text-gray-700 hover:text-primary transition-colors">
               Jobs
             </NuxtLink>
-            <NuxtLink to="/internships" class="text-gray-700 hover:text-primary transition-colors">
+            <NuxtLink :to="{ path: '/internships', query: $route.query }" class="text-gray-700 hover:text-primary transition-colors">
               Internships
             </NuxtLink>
-            <!-- <NuxtLink to="/companies" class="text-gray-700 hover:text-primary transition-colors">
-              Companies
-            </NuxtLink>
-            <NuxtLink to="/about" class="text-gray-700 hover:text-primary transition-colors">
-              About
-            </NuxtLink> -->
           </div>
 
           <!-- Right Side Actions -->
@@ -71,7 +65,10 @@
             <NuxtLink
               v-for="link in ['Home', 'Jobs', 'Internships']"
               :key="link"
-              :to="link === 'Home' ? '/' : `/${link.toLowerCase()}`"
+              :to="{ 
+                path: link === 'Home' ? '/' : `/${link.toLowerCase()}`,
+                query: $route.query
+              }"
               class="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
               @click="isMenuOpen = false"
             >
@@ -97,7 +94,9 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 const isMenuOpen = ref(false)
+const route = useRoute()
 </script>
 
 <style scoped>
