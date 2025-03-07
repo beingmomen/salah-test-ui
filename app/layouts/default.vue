@@ -17,7 +17,7 @@
             <NuxtLink :to="{ path: '/' }" class="text-gray-700 hover:text-primary transition-colors">
               Home
             </NuxtLink>
-            <NuxtLink :to="{ path: '/jobs' }" class="text-gray-700 hover:text-primary transition-colors">
+            <NuxtLink :to="{ path: '/jobs', query: $route.query }" class="text-gray-700 hover:text-primary transition-colors">
               Jobs
             </NuxtLink>
             <NuxtLink :to="{ path: '/internships', query: $route.query }" class="text-gray-700 hover:text-primary transition-colors">
