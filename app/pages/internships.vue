@@ -36,7 +36,7 @@
 
                 <UInput
                   v-model="pendingSearchQuery"
-                  placeholder="Search internships..."
+                  placeholder="Search jobs..."
                   icon="i-lucide-search"
                 />
 
@@ -50,7 +50,7 @@
                     />
                   </div>
                   <ul class="space-y-2">
-                    <li v-for="dept in allData.departments" :key="dept.documentNumber">
+                    <li v-for="dept in allData.departments" :key="dept.documentNumber" class="flex items-center justify-between">
                       <UCheckbox
                         :model-value="pendingDepartments.includes(String(dept.documentNumber))"
                         :label="dept.name"
@@ -66,6 +66,10 @@
                           }
                         }"
                       />
+
+                      <UBadge>
+                        {{ dept.interCount }}
+                      </UBadge>
                     </li>
                   </ul>
                 </div>
@@ -80,7 +84,7 @@
                     />
                   </div>
                   <ul class="space-y-2">
-                    <li v-for="location in allData.locations" :key="location.documentNumber">
+                    <li v-for="location in allData.locations" :key="location.documentNumber" class="flex items-center justify-between">
                       <UCheckbox
                         :model-value="pendingLocations.includes(String(location.documentNumber))"
                         :label="location.name"
@@ -96,6 +100,10 @@
                           }
                         }"
                       />
+
+                      <UBadge>
+                        {{ location.interCount }}
+                      </UBadge>
                     </li>
                   </ul>
                 </div>
@@ -110,7 +118,7 @@
                     />
                   </div>
                   <ul class="space-y-2">
-                    <li v-for="level in allData.levels" :key="level.documentNumber">
+                    <li v-for="level in allData.levels" :key="level.documentNumber" class="flex items-center justify-between"> 
                       <UCheckbox
                         :model-value="pendingLevels.includes(String(level.documentNumber))"
                         :label="level.name"
@@ -126,6 +134,10 @@
                           }
                         }"
                       />
+
+                      <UBadge>
+                        {{ level.interCount }}
+                      </UBadge>
                     </li>
                   </ul>
                 </div>
@@ -158,7 +170,7 @@
           <UCard>
             <UInput
               v-model="searchQuery"
-              placeholder="Search internships..."
+              placeholder="Search jobs..."
               icon="i-lucide-search"
             />
           </UCard>
@@ -189,7 +201,7 @@
                   />
                 </div>
                 <ul class="space-y-2">
-                  <li v-for="dept in allData.departments" :key="dept.documentNumber">
+                  <li v-for="dept in allData.departments" :key="dept.documentNumber" class="flex items-center justify-between">
                     <UCheckbox
                       :model-value="selectedDepartments.includes(String(dept.documentNumber))"
                       :label="dept.name"
@@ -207,6 +219,10 @@
                         }
                       }"
                     />
+
+                    <UBadge>
+                      {{ dept.interCount }}
+                    </UBadge>
                   </li>
                 </ul>
               </div>
@@ -221,7 +237,7 @@
                   />
                 </div>
                 <ul class="space-y-2">
-                  <li v-for="location in allData.locations" :key="location.documentNumber">
+                  <li v-for="location in allData.locations" :key="location.documentNumber" class="flex items-center justify-between">
                     <UCheckbox
                       :model-value="selectedLocations.includes(String(location.documentNumber))"
                       :label="location.name"
@@ -239,6 +255,10 @@
                         }
                       }"
                     />
+
+                    <UBadge>
+                      {{ location.interCount }}
+                    </UBadge>
                   </li>
                 </ul>
               </div>
@@ -253,7 +273,7 @@
                   />
                 </div>
                 <ul class="space-y-2">
-                  <li v-for="level in allData.levels" :key="level.documentNumber">
+                  <li v-for="level in allData.levels" :key="level.documentNumber" class="flex items-center justify-between">
                     <UCheckbox
                       :model-value="selectedLevels.includes(String(level.documentNumber))"
                       :label="level.name"
@@ -271,7 +291,11 @@
                         }
                       }"
                     />
-                  </li>
+
+                    <UBadge>
+                      {{ level.interCount }}
+                    </UBadge>
+                    </li>
                 </ul>
               </div>
             </div>
@@ -347,37 +371,33 @@
 import { useGlobalData } from "~/composables/useGlobalData";
 
 const {
+  fetchAllJobs,
   allData,
   jobs,
-  isMobileView,
-  isViewportReady,
   searchQuery,
-  pendingSearchQuery,
-  selectedDepartments,
-  pendingDepartments,
-  selectedLocations,
-  pendingLocations,
-  selectedLevels,
-  pendingLevels,
   selectAllDepartments,
   selectAllLocations,
   selectAllLevels,
-  showMobileFilters,
-  resetFilters,
-  resetMobileFilters,
+  selectedDepartments,
+  selectedLocations,
+  selectedLevels,
+  updateFilters,
   toggleAllDepartments,
   toggleAllLocations,
   toggleAllLevels,
-  updateFilters,
+  isMobileView,
+  pendingSearchQuery,
+  pendingDepartments,
+  pendingLocations,
+  pendingLevels,
+  showMobileFilters,
   applyMobileFilters,
-  fetchAllJobs,
+  resetMobileFilters,
+  resetFilters,
+  isViewportReady,
 } = useGlobalData({ isInternship: true });
 
-// Initialize data
-import { onMounted } from 'vue';
-onMounted(async () => {
-  await fetchAllJobs();
-});
+await fetchAllJobs();
 </script>
 
 <style scoped>
