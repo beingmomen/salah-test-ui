@@ -20,6 +20,9 @@
             <NuxtLink to="/jobs" class="text-gray-700 hover:text-primary transition-colors">
               Jobs
             </NuxtLink>
+            <NuxtLink to="/internships" class="text-gray-700 hover:text-primary transition-colors">
+              Internships
+            </NuxtLink>
             <!-- <NuxtLink to="/companies" class="text-gray-700 hover:text-primary transition-colors">
               Companies
             </NuxtLink>
@@ -66,7 +69,7 @@
         >
           <div v-if="isMenuOpen" class="md:hidden py-2 space-y-2">
             <NuxtLink
-              v-for="link in ['Home', 'Jobs', 'Companies', 'About']"
+              v-for="link in ['Home', 'Jobs', 'Internships']"
               :key="link"
               :to="link === 'Home' ? '/' : `/${link.toLowerCase()}`"
               class="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"

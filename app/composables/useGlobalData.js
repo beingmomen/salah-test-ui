@@ -5,7 +5,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 const allData = ref({})
 const jobs = ref([])
 
-export const useGlobalData = () =>  {
+export const useGlobalData = (opt) =>  {
     const route = useRoute()
     const router = useRouter()
     const isMobileView = ref(false)
@@ -310,6 +310,8 @@ export const useGlobalData = () =>  {
 
     const fetchAllJobs = async () => {
         const params = {};
+
+        console.warn('opt', opt);
         
         // Use the current active values based on view mode
         const searchValue = isMobileView.value ? pendingSearchQuery.value : searchQuery.value;
@@ -321,6 +323,7 @@ export const useGlobalData = () =>  {
         if (depts.length) params.department = depts.join(',');
         if (locs.length) params.location = locs.join(',');
         if (lvls.length) params.level = lvls.join(',');
+        if (opt?.isInternship) params.isInternship = true;
         
         params.limit = 5;
         
