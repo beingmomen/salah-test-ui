@@ -99,33 +99,35 @@ export const useGlobalData = () =>  {
     pendingLevels.value = [...selectedLevels.value]
 
     const updateFilters = () => {
-        // Don't update if any "Select All" is checked
-        if (selectAllDepartments.value || selectAllLocations.value || selectAllLevels.value) {
-            return;
-        }
-
         const query = {}
         
         // Use the current active values based on view mode
         const searchValue = isMobileView.value ? pendingSearchQuery.value : debouncedSearch.value
-        const depts = isMobileView.value ? pendingDepartments.value : selectedDepartments.value
-        const locs = isMobileView.value ? pendingLocations.value : selectedLocations.value
-        const lvls = isMobileView.value ? pendingLevels.value : selectedLevels.value
+
+        // Handle departments
+        if (isMobileView.value && !selectAllDepartments.value && pendingDepartments.value.length) {
+            query.department = pendingDepartments.value.join(',')
+        } else if (!isMobileView.value && !selectAllDepartments.value && selectedDepartments.value.length) {
+            query.department = selectedDepartments.value.join(',')
+        }
         
+        // Handle locations
+        if (isMobileView.value && !selectAllLocations.value && pendingLocations.value.length) {
+            query.location = pendingLocations.value.join(',')
+        } else if (!isMobileView.value && !selectAllLocations.value && selectedLocations.value.length) {
+            query.location = selectedLocations.value.join(',')
+        }
+        
+        // Handle levels
+        if (isMobileView.value && !selectAllLevels.value && pendingLevels.value.length) {
+            query.level = pendingLevels.value.join(',')
+        } else if (!isMobileView.value && !selectAllLevels.value && selectedLevels.value.length) {
+            query.level = selectedLevels.value.join(',')
+        }
+
+        // Handle search
         if (searchValue) {
             query.search = searchValue
-        }
-        
-        if (depts.length) {
-            query.department = depts.join(',')
-        }
-        
-        if (locs.length) {
-            query.location = locs.join(',')
-        }
-        
-        if (lvls.length) {
-            query.level = lvls.join(',')
         }
         
         router.push({ query })
@@ -193,13 +195,12 @@ export const useGlobalData = () =>  {
             pendingDepartments.value = []
         } else {
             selectedDepartments.value = []
+            // Only update query and fetch jobs in desktop mode
+            const newQuery = { ...route.query }
+            delete newQuery.department
+            router.push({ query: newQuery })
+            fetchAllJobs()
         }
-        // Clear query parameters when selecting "All"
-        const newQuery = { ...route.query }
-        delete newQuery.department
-        router.push({ query: newQuery })
-        // Reset jobs without department filter
-        fetchAllJobs()
     }
 
     const toggleAllLocations = () => {
@@ -208,13 +209,12 @@ export const useGlobalData = () =>  {
             pendingLocations.value = []
         } else {
             selectedLocations.value = []
+            // Only update query and fetch jobs in desktop mode
+            const newQuery = { ...route.query }
+            delete newQuery.location
+            router.push({ query: newQuery })
+            fetchAllJobs()
         }
-        // Clear query parameters when selecting "All"
-        const newQuery = { ...route.query }
-        delete newQuery.location
-        router.push({ query: newQuery })
-        // Reset jobs without location filter
-        fetchAllJobs()
     }
 
     const toggleAllLevels = () => {
@@ -223,13 +223,12 @@ export const useGlobalData = () =>  {
             pendingLevels.value = []
         } else {
             selectedLevels.value = []
+            // Only update query and fetch jobs in desktop mode
+            const newQuery = { ...route.query }
+            delete newQuery.level
+            router.push({ query: newQuery })
+            fetchAllJobs()
         }
-        // Clear query parameters when selecting "All"
-        const newQuery = { ...route.query }
-        delete newQuery.level
-        router.push({ query: newQuery })
-        // Reset jobs without level filter
-        fetchAllJobs()
     }
 
     // Watch for changes in selections to update "Select All" states

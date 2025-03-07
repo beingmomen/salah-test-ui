@@ -58,12 +58,10 @@
                           selectAllDepartments = false;
                           if (checked) {
                             pendingDepartments.push(String(dept.documentNumber))
-                            updateFilters()
                           } else {
                             const index = pendingDepartments.indexOf(String(dept.documentNumber))
                             if (index > -1) {
                               pendingDepartments.splice(index, 1)
-                              updateFilters()
                             }
                           }
                         }"
@@ -90,12 +88,10 @@
                           selectAllLocations = false;
                           if (checked) {
                             pendingLocations.push(String(location.documentNumber))
-                            updateFilters()
                           } else {
                             const index = pendingLocations.indexOf(String(location.documentNumber))
                             if (index > -1) {
                               pendingLocations.splice(index, 1)
-                              updateFilters()
                             }
                           }
                         }"
@@ -122,12 +118,10 @@
                           selectAllLevels = false;
                           if (checked) {
                             pendingLevels.push(String(level.documentNumber))
-                            updateFilters()
                           } else {
                             const index = pendingLevels.indexOf(String(level.documentNumber))
                             if (index > -1) {
                               pendingLevels.splice(index, 1)
-                              updateFilters()
                             }
                           }
                         }"
