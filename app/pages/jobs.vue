@@ -55,12 +55,15 @@
                         :model-value="pendingDepartments.includes(String(dept.documentNumber))"
                         :label="dept.name"
                         @update:model-value="(checked) => {
+                          selectAllDepartments = false;
                           if (checked) {
                             pendingDepartments.push(String(dept.documentNumber))
+                            updateFilters()
                           } else {
                             const index = pendingDepartments.indexOf(String(dept.documentNumber))
                             if (index > -1) {
                               pendingDepartments.splice(index, 1)
+                              updateFilters()
                             }
                           }
                         }"
@@ -84,12 +87,15 @@
                         :model-value="pendingLocations.includes(String(location.documentNumber))"
                         :label="location.name"
                         @update:model-value="(checked) => {
+                          selectAllLocations = false;
                           if (checked) {
                             pendingLocations.push(String(location.documentNumber))
+                            updateFilters()
                           } else {
                             const index = pendingLocations.indexOf(String(location.documentNumber))
                             if (index > -1) {
                               pendingLocations.splice(index, 1)
+                              updateFilters()
                             }
                           }
                         }"
@@ -113,12 +119,15 @@
                         :model-value="pendingLevels.includes(String(level.documentNumber))"
                         :label="level.name"
                         @update:model-value="(checked) => {
+                          selectAllLevels = false;
                           if (checked) {
                             pendingLevels.push(String(level.documentNumber))
+                            updateFilters()
                           } else {
                             const index = pendingLevels.indexOf(String(level.documentNumber))
                             if (index > -1) {
                               pendingLevels.splice(index, 1)
+                              updateFilters()
                             }
                           }
                         }"
@@ -191,15 +200,17 @@
                       :model-value="selectedDepartments.includes(String(dept.documentNumber))"
                       :label="dept.name"
                       @update:model-value="(checked) => {
+                        selectAllDepartments = false;
                         if (checked) {
                           selectedDepartments.push(String(dept.documentNumber))
+                          updateFilters()
                         } else {
                           const index = selectedDepartments.indexOf(String(dept.documentNumber))
                           if (index > -1) {
                             selectedDepartments.splice(index, 1)
+                            updateFilters()
                           }
                         }
-                        updateFilters()
                       }"
                     />
                   </li>
@@ -221,15 +232,17 @@
                       :model-value="selectedLocations.includes(String(location.documentNumber))"
                       :label="location.name"
                       @update:model-value="(checked) => {
+                        selectAllLocations = false;
                         if (checked) {
                           selectedLocations.push(String(location.documentNumber))
+                          updateFilters()
                         } else {
                           const index = selectedLocations.indexOf(String(location.documentNumber))
                           if (index > -1) {
                             selectedLocations.splice(index, 1)
+                            updateFilters()
                           }
                         }
-                        updateFilters()
                       }"
                     />
                   </li>
@@ -251,15 +264,17 @@
                       :model-value="selectedLevels.includes(String(level.documentNumber))"
                       :label="level.name"
                       @update:model-value="(checked) => {
+                        selectAllLevels = false;
                         if (checked) {
                           selectedLevels.push(String(level.documentNumber))
+                          updateFilters()
                         } else {
                           const index = selectedLevels.indexOf(String(level.documentNumber))
                           if (index > -1) {
                             selectedLevels.splice(index, 1)
+                            updateFilters()
                           }
                         }
-                        updateFilters()
                       }"
                     />
                   </li>

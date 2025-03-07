@@ -99,6 +99,11 @@ export const useGlobalData = () =>  {
     pendingLevels.value = [...selectedLevels.value]
 
     const updateFilters = () => {
+        // Don't update if any "Select All" is checked
+        if (selectAllDepartments.value || selectAllLocations.value || selectAllLevels.value) {
+            return;
+        }
+
         const query = {}
         
         // Use the current active values based on view mode
@@ -130,7 +135,7 @@ export const useGlobalData = () =>  {
             searchQuery.value = pendingSearchQuery.value
             selectedDepartments.value = [...pendingDepartments.value]
             selectedLocations.value = [...pendingLocations.value]
-            selectedLevels.value = [...selectedLevels.value]
+            selectedLevels.value = [...pendingLevels.value]
         }
 
         // Fetch jobs after updating the URL and selections
@@ -183,77 +188,92 @@ export const useGlobalData = () =>  {
     }
 
     const toggleAllDepartments = () => {
-        const newValues = selectAllDepartments.value 
-            ? allData.value.departments?.map(dept => String(dept.documentNumber)) || []
-            : [];
-
+        selectAllDepartments.value = true;
         if (isMobileView.value) {
-            pendingDepartments.value = newValues
+            pendingDepartments.value = []
         } else {
-            selectedDepartments.value = newValues
-            updateFilters()
+            selectedDepartments.value = []
         }
+        // Clear query parameters when selecting "All"
+        const newQuery = { ...route.query }
+        delete newQuery.department
+        router.push({ query: newQuery })
+        // Reset jobs without department filter
+        fetchAllJobs()
     }
 
     const toggleAllLocations = () => {
-        const newValues = selectAllLocations.value 
-            ? allData.value.locations?.map(loc => String(loc.documentNumber)) || []
-            : [];
-
+        selectAllLocations.value = true;
         if (isMobileView.value) {
-            pendingLocations.value = newValues
+            pendingLocations.value = []
         } else {
-            selectedLocations.value = newValues
-            updateFilters()
+            selectedLocations.value = []
         }
+        // Clear query parameters when selecting "All"
+        const newQuery = { ...route.query }
+        delete newQuery.location
+        router.push({ query: newQuery })
+        // Reset jobs without location filter
+        fetchAllJobs()
     }
 
     const toggleAllLevels = () => {
-        const newValues = selectAllLevels.value 
-            ? allData.value.levels?.map(level => String(level.documentNumber)) || []
-            : [];
-
+        selectAllLevels.value = true;
         if (isMobileView.value) {
-            pendingLevels.value = newValues
+            pendingLevels.value = []
         } else {
-            selectedLevels.value = newValues
-            updateFilters()
+            selectedLevels.value = []
         }
+        // Clear query parameters when selecting "All"
+        const newQuery = { ...route.query }
+        delete newQuery.level
+        router.push({ query: newQuery })
+        // Reset jobs without level filter
+        fetchAllJobs()
     }
 
     // Watch for changes in selections to update "Select All" states
     watch([selectedDepartments, pendingDepartments], ([selected, pending]) => {
-        const departments = allData.value.departments?.map(dept => String(dept.documentNumber)) || []
         if (isMobileView.value) {
-            selectAllDepartments.value = departments.length > 0 && 
-                departments.every(dept => pending.includes(dept))
+            // Uncheck "Select All" if there are selections
+            if (pending.length > 0) {
+                selectAllDepartments.value = false
+            }
         } else {
-            selectAllDepartments.value = departments.length > 0 && 
-                departments.every(dept => selected.includes(dept))
+            // Uncheck "Select All" if there are selections
+            if (selected.length > 0) {
+                selectAllDepartments.value = false
+            }
         }
-    }, { immediate: true })
+    })
 
     watch([selectedLocations, pendingLocations], ([selected, pending]) => {
-        const locations = allData.value.locations?.map(loc => String(loc.documentNumber)) || []
         if (isMobileView.value) {
-            selectAllLocations.value = locations.length > 0 && 
-                locations.every(loc => pending.includes(loc))
+            // Uncheck "Select All" if there are selections
+            if (pending.length > 0) {
+                selectAllLocations.value = false
+            }
         } else {
-            selectAllLocations.value = locations.length > 0 && 
-                locations.every(loc => selected.includes(loc))
+            // Uncheck "Select All" if there are selections
+            if (selected.length > 0) {
+                selectAllLocations.value = false
+            }
         }
-    }, { immediate: true })
+    })
 
     watch([selectedLevels, pendingLevels], ([selected, pending]) => {
-        const levels = allData.value.levels?.map(level => String(level.documentNumber)) || []
         if (isMobileView.value) {
-            selectAllLevels.value = levels.length > 0 && 
-                levels.every(level => pending.includes(level))
+            // Uncheck "Select All" if there are selections
+            if (pending.length > 0) {
+                selectAllLevels.value = false
+            }
         } else {
-            selectAllLevels.value = levels.length > 0 && 
-                levels.every(level => selected.includes(level))
+            // Uncheck "Select All" if there are selections
+            if (selected.length > 0) {
+                selectAllLevels.value = false
+            }
         }
-    }, { immediate: true })
+    })
 
     // Watch for changes in allData to update "Select All" states when data loads
     watch(() => allData.value, () => {
@@ -262,19 +282,25 @@ export const useGlobalData = () =>  {
         const levels = allData.value.levels?.map(level => String(level.documentNumber)) || []
 
         if (isMobileView.value) {
-            selectAllDepartments.value = departments.length > 0 && 
-                departments.every(dept => pendingDepartments.value.includes(dept))
-            selectAllLocations.value = locations.length > 0 && 
-                locations.every(loc => pendingLocations.value.includes(loc))
-            selectAllLevels.value = levels.length > 0 && 
-                levels.every(level => pendingLevels.value.includes(level))
+            if (pendingDepartments.value.length > 0) {
+                selectAllDepartments.value = false
+            }
+            if (pendingLocations.value.length > 0) {
+                selectAllLocations.value = false
+            }
+            if (pendingLevels.value.length > 0) {
+                selectAllLevels.value = false
+            }
         } else {
-            selectAllDepartments.value = departments.length > 0 && 
-                departments.every(dept => selectedDepartments.value.includes(dept))
-            selectAllLocations.value = locations.length > 0 && 
-                locations.every(loc => selectedLocations.value.includes(loc))
-            selectAllLevels.value = levels.length > 0 && 
-                levels.every(level => selectedLevels.value.includes(level))
+            if (selectedDepartments.value.length > 0) {
+                selectAllDepartments.value = false
+            }
+            if (selectedLocations.value.length > 0) {
+                selectAllLocations.value = false
+            }
+            if (selectedLevels.value.length > 0) {
+                selectAllLevels.value = false
+            }
         }
     }, { immediate: true })
 
